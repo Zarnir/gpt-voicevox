@@ -8,27 +8,29 @@ export const Chat = () => {
   const [chats, setChats] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
 
+  const API_URL = configs.API_URL;
+
   const chat = async (e, message) => {
-    e.preventDefault;
+    e.preventDefault();
 
     if (!message) return;
     
     setIsTyping(true);
     scrollTo(0, 1e10);
 
-    let msgs = chat;
+    let msgs = chats;
     msgs.push({ role: 'user', content: message });
     setChats(msgs);
 
     setMessage('');
 
-    await ajax(
-      msgs,
-      configs.API,
-      'GET',
-    )
-    .then(result => result.json())
-    .then(data => {
+    await ajax({
+      method: 'POST',
+      url: API_URL,
+      data: msgs,
+    })
+    .then((response) => response.json())
+    .then(({ data }) => {
       msgs.push(data);
       setChats(msgs);
       setIsTyping(false);
@@ -39,13 +41,13 @@ export const Chat = () => {
 
   return (
     <div>
-      <h2>Ask-Me-Mortal-GPT</h2>
+      <h2>Ask Me Anything Mortal</h2>
 
       <section>
         {
           chats && chats.length
           ? chats.map((chat, index) => (
-            <p key = {index} className = {chat.role === 'user' ? 'user_msg' : ''}>
+            <p key={index} className={chat.role === 'user' ? 'user_msg' : ''}>
               <span>
                 <b>{ chat.role.toUpperCase() }</b>
               </span>
@@ -57,19 +59,19 @@ export const Chat = () => {
         }
       </section>
 
-      <div className = { isTyping ? '' : 'hide' }>
+      <div className={isTyping ? '' : 'hide'}>
         <p>
-          <i>{ isTyping ? 'Typing' : '' }</i>
+          <i>{isTyping ? 'Typing' : ''}</i>
         </p>
       </div>
 
-      <form action = '' onSubmit={ (e) => chat(e, message) }>
+      <form action = '' onSubmit={(e) => chat(e, message)}>
         <input
-          type = 'text'
-          name = 'message'
-          value = {message}
-          placeholder = 'Ask anythings'
-          onChange = { (e) => setMessage(e.target.value) }
+          type='text'
+          name='message'
+          value={message}
+          placeholder='Ask anythings'
+          onChange={(e) => setMessage(e.target.value)}
         />
       </form>
     </div>
